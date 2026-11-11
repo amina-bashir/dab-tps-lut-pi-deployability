@@ -96,9 +96,19 @@ The switched circuit model uses ideal switches (R_on = 1 µΩ, no dead time) and
 
 The switched model reproduces the offline result: the current is tracked at light and heavy load, and the loop is lost in the same medium-load band.
 
+
+
 ## Conclusion
 
-The ZVS-constrained optimal modulation LUT can be run by a fixed PI controller at light and heavy load, where it is also more efficient than SPS. At medium load, holding ZVS on all eight commutations reverses the sampled gain, so the PI controller loses the current, and it also costs efficiency. In that band ZVS should be relaxed, and this LUT should not be deployed there as it is.
+This project shows that the ZVS constraint is cheap at low and high output voltage, and expensive in the medium voltage range. Three independent results point to the same picture: the sampled gain g_s, the PI controller on the charging ramp, and the efficiency against SPS.
+
+**Low (200–500 V) and high (700–1000 V) voltage range, light and heavy load.** Here the minimum-RMS triplet with ZVS on all eight commutations varies smoothly with the command, so the LUT behaves like an ideal inverse modulation. The sampled gain stays close to unity, between 0.96 and 1.03, with no reversal along the charging profile. A PI controller tuned on this gain reaches a crossover of 300 Hz with PM ≥ 86° and GM ≥ 18.5 dB. On the 700–1000 V ramp it tracks the reference with a worst error of 0.40 A, and the switched Simulink model tracks the current over the whole low and high range. Because every commutation is soft, the estimated efficiency stays between about 97 and 98.5 %. SPS reaches that level only near the matched voltage, around 470 V, and falls to about 83 % at 1000 V.
+
+**Medium voltage range (500–700 V, medium load).** Here ZVS on all eight commutations can be held only by triplets with a high circulating current, and the minimum-RMS selection jumps between them from one operating point to the next. The efficiency drops to about 92.5 %, below SPS, so holding full ZVS costs more than it saves. The interpolated LUT spans these jumps and the sampled gain reverses in three stretches, down to about −23. A command correction then moves the current the wrong way, and on the 500–700 V ramp the PI controller saturates in 163 of 1250 periods with a tracking error of 69.0 A. The switched Simulink model loses the current in the same band.
+
+**The g_s metric.** g_s identified this failure from the stored LUT alone, before any closed-loop test. It located the reversal stretches along the charging profile, and the widest one (25.4 V, crossed in 3.2 ms) limited the crossover of any PI controller in that range to 50 Hz. Its spread gave the margins the controllers were tuned for in the other two ranges. The ramps and the Simulink model then confirmed exactly what g_s predicted: tracking at light and heavy load, loss of the current at medium load. This makes g_s a practical check of whether an optimal-modulation LUT can be run by a fixed PI controller, and of where it cannot.
+
+The result points to the next step: in the medium voltage range, the ZVS constraint should be relaxed, so that the modulation keeps a low RMS current and a sampled gain close to unity.
 
 ## How to run
 
