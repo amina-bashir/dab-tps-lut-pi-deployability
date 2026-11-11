@@ -1,0 +1,20 @@
+Vi = 800;
+Vo = 800;
+Ri = 100e-3;
+Ro = 100e-3;
+Li = 10e-6;
+Lo = 10e-6;
+Ci = 30e-6;
+Co = 44e-6;
+n  = 1.7;
+Ls = 15e-6;
+Rs = 25e-3;
+f_sw  = 50e3;
+omega = 2*pi*f_sw;
+
+param.V1 = Vi;  param.V2 = Vo;
+param.R1 = Ri;  param.R2 = Ro;
+param.L1 = Li;  param.L2 = Lo;
+param.C1 = Ci;  param.C2 = Co;
+param.L  = Ls;  param.R  = Rs;
+param.n  = n;   param.fs = f_sw;
