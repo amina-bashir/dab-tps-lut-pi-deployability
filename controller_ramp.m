@@ -21,8 +21,7 @@ U_LIM     = 20;
 N_DELAY   = 1;
 
 BANDS = [200 500; 500 700; 700 1000];
-RAMP  = [true true true];
-CHECK = [false true true];
+RAMP  = [false true true];
 NB = size(BANDS,1);
 
 S  = load(FILES{1});
@@ -180,7 +179,6 @@ for b = 1:NB
     else
         eff = NaN;  ecl = NaN;  y_cl = NaN;  u_cl = NaN;  m_cl = NaN;  Nsim = 0;
         t = [];  r_t = [];  y_ff = [];
-        fprintf('ramp skipped: CC part sits on the table top, no LUT headroom for the PI\n');
     end
 
     R = struct();
@@ -209,7 +207,7 @@ for b = 1:NB
     R.rampClamp   = sum(abs(u_cl) >= U_LIM-1e-9) * RAMP(b);
     R.rampN       = Nsim;
     R.rampModeChanges = sum(diff(m_cl) ~= 0);
-    R.ok = pick.pass && R.nStretches == 0 && (~CHECK(b) || (R.rampWorstCL <= U_LIM && R.rampClamp == 0));
+    R.ok = pick.pass && R.nStretches == 0 && (~RAMP(b) || (R.rampWorstCL <= U_LIM && R.rampClamp == 0));
     R.t = t;  R.ref = r_t;  R.yff = y_ff;  R.ycl = y_cl;  R.ucl = u_cl;
     RES = [RES, R];
 end
@@ -218,7 +216,7 @@ fprintf('\n%-12s %8s %8s %8s %10s %8s %12s %12s %8s %8s %10s %7s  %s\n', 'band (
 fprintf('%s\n', repmat('-',1,137));
 for b = 1:NB
     R = RES(b);
-    if CHECK(b), es = sprintf('%10.3f %7d', R.rampWorstCL, R.rampClamp); else, es = sprintf('%10s %7s', '-', '-'); end
+    if RAMP(b), es = sprintf('%10.3f %7d', R.rampWorstCL, R.rampClamp); else, es = sprintf('%10s %7s', '-', '-'); end
     fprintf('%4g - %-5g %8.4f %8.4f %8.4f %10d %8.0f %12.5g %12.5g %8.1f %8.1f %s  %s\n', ...
             R.band(1), R.band(2), R.gmed, R.glo, R.ghi, R.nStretches, R.fc, R.kp, R.ki, ...
             min(R.pmlo,R.pmhi), min(R.gmlo,R.gmhi), es, yn2(R.ok, 'OK', 'PI FAILS'));
